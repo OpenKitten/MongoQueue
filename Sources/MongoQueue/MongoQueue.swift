@@ -328,7 +328,19 @@ public final class MongoQueue: @unchecked Sendable {
             )
             uniqueKeyIndex.unique = true
             uniqueKeyIndex.partialFilterExpression = ["status": ["$in": ["scheduled", "executing"]]]
-            try await collection.createIndexes([uniqueKeyIndex])
+
+            let findNextTaskIndex = CreateIndexes.Index(
+                named: "next-task-index",
+                keys: [
+                    "status": 1,
+                    "executeAfter": 1,
+                    "priority": -1,
+                    "executeBefore": 1,
+                    "creationDate": 1
+                ]
+            )
+
+            try await collection.createIndexes([uniqueKeyIndex, findNextTaskIndex])
         }
     }
 
