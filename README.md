@@ -55,17 +55,17 @@ Register the task to MongoQueue, before it starts.
 queue.registerTask(RegistrationEmailTask.self, context: ())
 ```
 
-Start the queue in the background - this is helpful in use inside HTTP applications - or when creating separate workers.
+### Service Lifecycle
 
-```swift
-try queue.runInBackground()
-```
-
-Alternatively, run the queue in the foreground and block until the queue is stopped. Only use this if your queue worker is only running as a worker. I.E., it isn't serving users on the side.
+MongoQueue can be used as a service, and will automatically start and stop when the service starts and stops.
 
 ```swift
 try await queue.run()
 ```
+
+Hummingbird 2 users can use the `MongoQueue` to their `Application` to automatically start and stop the queue along with the application.
+
+### Adding Tasks
 
 Queue the task in MongoDB:
 
