@@ -5,7 +5,7 @@ import Foundation
 import Meow
 import Tracing
 import Metrics
-
+import ServiceLifecycle
 /// A MongoQueue is a queue that uses MongoDB as a backend for storing tasks. It is designed to be used in a distributed environment.
 ///
 /// 1. First, connect to MongoDB and create the MongoQueue.
@@ -27,7 +27,7 @@ import Metrics
 /// ```swift
 /// try await queue.queueTask(Reminder(username: "Joannis"))
 /// ```
-public final class MongoQueue: @unchecked Sendable {
+public final class MongoQueue: @unchecked Sendable, Service {
     public struct Option: Hashable {
         internal enum _Option: Hashable {
             case uniqueKeysEnabled
@@ -328,7 +328,19 @@ public final class MongoQueue: @unchecked Sendable {
             )
             uniqueKeyIndex.unique = true
             uniqueKeyIndex.partialFilterExpression = ["status": ["$in": ["scheduled", "executing"]]]
-            try await collection.createIndexes([uniqueKeyIndex])
+
+            let findNextTaskIndex = CreateIndexes.Index(
+                named: "next-task-index",
+                keys: [
+                    "status": 1,
+                    "executeAfter": 1,
+                    "priority": -1,
+                    "executeBefore": 1,
+                    "creationDate": 1
+                ]
+            )
+
+            try await collection.createIndexes([uniqueKeyIndex, findNextTaskIndex])
         }
     }
 

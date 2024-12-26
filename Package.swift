@@ -18,6 +18,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/orlandos-nl/MongoKitten.git", from: "7.9.0"),
+        .package(url: "https://github.com/swift-server/swift-service-lifecycle.git", from: "2.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -26,7 +27,8 @@ let package = Package(
             name: "MongoQueue",
             dependencies: [
                 .product(name: "MongoKitten", package: "MongoKitten"),
-                .product(name: "Meow", package: "MongoKitten")
+                .product(name: "Meow", package: "MongoKitten"),
+                .product(name: "ServiceLifecycle", package: "swift-service-lifecycle"),
             ]
         ),
         .testTarget(
